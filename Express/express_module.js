@@ -28,7 +28,8 @@ app.post('/login', (req, res, next) => {
 	var user_password = req.body.password;
 
 	var info;
-	mysqlDB.query('SELECT * FROM tb_user WHERE id = ? and password = ?', [user_id, user_password], (err, rows, fields) => {
+	mysqlDB.query('SELECT * FROM tb_user WHERE id = ? and password = ?'
+        , [user_id, user_password], (err, rows, fields) => {
         if (!err) {
             if(rows[0] != undefined){
                 info = JSON.stringify(rows);
@@ -46,13 +47,14 @@ app.post('/login', (req, res, next) => {
 });
 
 //return true or false
-app.post('/signup', (req, res, next)=>{
+app.post('/signup', (req, res, next) => {
 	var user_id = req.body.id;
 	var user_password = req.body.password;
 	var user_email = req.body.email;
 	var user_name = req.body.name;
 
-	mysqlDB.query('INSERT INTO tb_user (id, password, email, name) VALUES (?, ?, ?, ?)', [user_id, user_password, user_email, user_email], (err, rows, fields) => {
+	mysqlDB.query('INSERT INTO tb_user (id, password, email, name) VALUES (?, ?, ?, ?)'
+        , [user_id, user_password, user_email, user_email], (err, rows, fields) => {
         if (!err) {
         	console.log('--> ' + JSON.stringify(rows));
         	res.send(true);
