@@ -2,13 +2,9 @@ const http = require('http');
 const express = require('express');
 const bodyParser = require('body-parser');
 const multer = require('multer');
-const mysql = require('mysql');
 
 const hostname = '127.0.0.1';
 const port = 3000;
-
-const dbHost = 'localhost';
-const dbPort = 3306;
 
 var app = express();
 var upload = multer();
@@ -20,33 +16,30 @@ app.use(bodyParser.json());
 // parse multipart/form-data
 app.use(upload.array());
 
+var mysqlDB = require('./mysql-db');
+mysqlDB.connect();
 
 app.listen(port, () => {
- console.log('Example app listening on port 3000!');
+ console.log('Express Modules listening on port 3000!');
 });
 
 app.post('/login', (req, res, next) => {
 	var user_id = req.body.id;
 	var user_password = req.body.password;
 
-	var connection = mysql.createConnection({
-		host: dbHost,
-		post: dbPort,
-		user: 'root',
-		password: 'root',
-		database: 'vue_project'
-	});
-
 	var info;
-	connection.connect();
-	connection.query("SELECT * FROM tb_user WHERE id = '" + user_id + "' and password = '" + user_password + "';", (err, rows, fields) => {
-        connection.end();
+	mysqlDB.query('SELECT * FROM tb_user WHERE id = ? and password = ?', [user_id, user_password], (err, rows, fields) => {
         if (!err) {
-            info = JSON.stringify(rows);
-            console.log(info);
-            res.send(info);
+            if(rows[0] != undefined){
+                info = JSON.stringify(rows);
+                console.log('--> ' + info);
+                res.send(info);
+            }else{
+                console.log('--> Can not find Account ' + user_id)
+                res.send(null);
+            }
         } else {
-            console.log(err);
+            console.log('--> ' + err);
             res.send(null);
         }
     });
@@ -59,23 +52,12 @@ app.post('/signup', (req, res, next)=>{
 	var user_email = req.body.email;
 	var user_name = req.body.name;
 
-	var connection = mysql.createConnection({
-		host: dbHost,
-		post: dbPort,
-		user: 'root',
-		password: 'root',
-		database: 'vue_project'
-	});
-
-	connection.connect();
-
-	connection.query("INSERT INTO tb_user (id, password, email, name) VALUES ('" + user_id + "', '" + user_password + "', '" + user_email +"', '" + user_name + "');", (err, rows, fields) => {
-        connection.end();
+	mysqlDB.query('INSERT INTO tb_user (id, password, email, name) VALUES (?, ?, ?, ?)', [user_id, user_password, user_email, user_email], (err, rows, fields) => {
         if (!err) {
-        	console.log("insert user data");
+        	console.log('--> ' + JSON.stringify(rows));
         	res.send(true);
         } else {
-            console.log(err);
+            console.log('--> ' + err);
             res.send(false);
         } 
     });
