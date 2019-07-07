@@ -39,15 +39,44 @@ app.post('/login', (req, res, next) => {
 
 	var info;
 	connection.connect();
-	connection.query("SELECT * FROM tb_user WHERE id = '" + user_id + "' and password = '" + user_password + "'", function (err, rows, fields) {
+	connection.query("SELECT * FROM tb_user WHERE id = '" + user_id + "' and password = '" + user_password + "';", (err, rows, fields) => {
         connection.end();
         if (!err) {
             info = JSON.stringify(rows);
             console.log(info);
             res.send(info);
         } else {
-            console.log('query error : ' + err);
+            console.log(err);
             res.send(null);
         }
+    });
+});
+
+//return true or false
+app.post('/signup', (req, res, next)=>{
+	var user_id = req.body.id;
+	var user_password = req.body.password;
+	var user_email = req.body.email;
+	var user_name = req.body.name;
+
+	var connection = mysql.createConnection({
+		host: dbHost,
+		post: dbPort,
+		user: 'root',
+		password: 'root',
+		database: 'vue_project'
+	});
+
+	connection.connect();
+
+	connection.query("INSERT INTO tb_user (id, password, email, name) VALUES ('" + user_id + "', '" + user_password + "', '" + user_email +"', '" + user_name + "');", (err, rows, fields) => {
+        connection.end();
+        if (!err) {
+        	console.log("insert user data");
+        	res.send(true);
+        } else {
+            console.log(err);
+            res.send(false);
+        } 
     });
 });
