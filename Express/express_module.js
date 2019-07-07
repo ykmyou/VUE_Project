@@ -23,7 +23,7 @@ app.listen(port, () => {
  console.log('Express Modules listening on port 3000!');
 });
 
-app.post('/login', (req, res, next) => {
+app.post('/login', (req, res) => {
 	var user_id = req.body.id;
 	var user_password = req.body.password;
 
@@ -47,7 +47,7 @@ app.post('/login', (req, res, next) => {
 });
 
 //return true or false
-app.post('/signup', (req, res, next) => {
+app.post('/signup', (req, res) => {
 	var user_id = req.body.id;
 	var user_password = req.body.password;
 	var user_email = req.body.email;
