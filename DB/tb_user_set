@@ -1,6 +1,0 @@
-CREATE TABLE tb_user(
-	id varchar(20) PRIMARY KEY,
-	password varchar(20),
-	email varchar(30),
-	name varchar(30)
-);

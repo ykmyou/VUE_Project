@@ -1,0 +1,22 @@
+CREATE TABLE tb_user(
+	id varchar(20) PRIMARY KEY,
+	password varchar(20),
+	email varchar(30),
+	name varchar(30)
+);
+
+CREATE TABLE tb_job(
+	id varchar(20) PRIMARY KEY,
+	title text,
+	spec text,
+	status varchar(20),
+	start_date date,
+	end_date date,
+	creator varchar(20)
+);
+
+CREATE TABLE tb_worker(
+	user_id varchar(20),
+	job_id varchar(20),
+	PRIMARY KEY(user_id, job_id)
+);
