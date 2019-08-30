@@ -194,3 +194,99 @@ app.post('/jobSync', (req, res) => {
         }
     });
 });
+
+app.post('/chatAdd', (req, res) => {
+
+    var job_id = req.body.job_id;
+    var user_id = req.body.user_id;
+    var chat_id = createChatId();
+    var contents = req.body.contents;
+    var time = createTimeData();
+    var file_dir= req.body.file_dir;
+
+    var info = { msg: false, data: {}};
+    console.log(job_id + " " + user_id + " " + chat_id + " " + contents + " " + time + " " + file_dir);
+    mysqlDB.query('INSERT INTO tb_chat (job_id, user_id, chat_id, contents, time, file_dir) VALUES (?, ?, ?, ?, ?, ?)'
+        , [job_id, user_id, chat_id, contents, time, file_dir], (err, rows, fields) => {
+        if (!err) {
+            console.log('--> ' + JSON.stringify(rows));
+            info.msg = true;
+            info.data = {job_id : job_id, user_id : user_id, chat_id : chat_id, contents : contents, time : time, file_dir : file_dir};
+            res.send(true);
+        } else {
+            console.log('--> ' + err);
+            info.msg = false;
+            info.data = err;
+            res.send(false);
+        } 
+    });
+});
+
+function getDateInfos() {
+    var dateInfo = new Array();
+    dateInfo = new Date().toString().split(' ');
+
+    if (dateInfo[1] == 'Jan') {
+        dateInfo[1] = '01';
+    } else if (dateInfo[1] == 'Feb') {
+        dateInfo[1] = '02'; 
+    } else if (dateInfo[1] == 'Mar') {
+        dateInfo[1] = '03'; 
+    } else if (dateInfo[1] == 'Apr') {
+        dateInfo[1] = '04'; 
+    } else if (dateInfo[1] == 'May') {
+        dateInfo[1] = '05'; 
+    } else if (dateInfo[1] == 'Jun') {
+        dateInfo[1] = '06'; 
+    } else if (dateInfo[1] == 'Jul') {
+        dateInfo[1] = '07'; 
+    } else if (dateInfo[1] == 'Aug') {
+        dateInfo[1] = '08'; 
+    } else if (dateInfo[1] == 'Sep') {
+        dateInfo[1] = '09'; 
+    } else if (dateInfo[1] == 'Oct') {
+        dateInfo[1] = '10'; 
+    } else if (dateInfo[1] == 'Nov') {
+        dateInfo[1] = '11'; 
+    } else { // Dec
+        dateInfo[1] = '12'; 
+    }
+
+    return dateInfo;
+}
+
+function createTimeData() {
+    var date = new Array();
+    date = getDateInfos();
+    return date[3] + "/" + date[1] + "/" + date[2] + " " + date[4];
+}
+
+function createChatId() {
+    var date = new Array();
+    date = getDateInfos();
+    return date[3] + date[1] + date[2] + date[4]
+}
+
+app.post('/chatSync', (req, res) => {
+    // get job_id from req, send chat data to res
+    var job_id = req.body.job_id;
+    var info = { msg: false, data: { char_data: [] }};
+    mysqlDB.query('SELECT * FROM tb_chat WHERE job_id=?', [job_id], (err, rows, fields) => {
+        if (!err) {
+            if(rows[0] != undefined){
+                info.msg = true;
+                info.data = rows;
+            } else {
+                info.msg = false;
+                info.data = {};
+                console.log('--> Can not find Job');
+            }
+            res.send(info);
+        } else {
+            info.msg = false;
+            info.data = err;
+            console.log('--> ' + info);
+            res.send(info);
+        }
+    });
+});
