@@ -1,3 +1,7 @@
+CREATE DATABASE vue_project;
+
+USE vue_project;
+
 CREATE TABLE tb_user(
 	id varchar(20) PRIMARY KEY,
 	password varchar(20),
